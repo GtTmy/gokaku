@@ -1,5 +1,4 @@
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
-use reqwest;
 use reqwest::header;
 
 #[derive(Debug)]
@@ -53,7 +52,7 @@ struct KanjiAliveApi {
 }
 
 trait Strokes {
-    fn get_strokes(self: &Self, kanji: char) -> u32;
+    fn get_strokes(&self, kanji: char) -> u32;
 }
 
 impl KanjiApi {
@@ -79,7 +78,7 @@ impl Strokes for KanjiApi {
             if let serde_json::Value::Object(info) = &results[0] {
                 if let serde_json::Value::String(stroke_s) = &info["stroke"] {
                     let stroke: u32 = stroke_s.parse().unwrap();
-                    return stroke;
+                    stroke
                 } else {
                     panic!("error")
                 }
@@ -113,11 +112,11 @@ impl KanjiAliveApi {
 }
 
 impl Strokes for KanjiAliveApi {
-    fn get_strokes(self: &Self, kanji: char) -> u32 {
+    fn get_strokes(&self, kanji: char) -> u32 {
         let mut apiurl = String::from("https://kanjialive-api.p.rapidapi.com/api/public/kanji/");
         let encoded_kanji =
             utf8_percent_encode(&kanji.to_string()[..], NON_ALPHANUMERIC).to_string();
-        apiurl = apiurl + &encoded_kanji[..];
+        apiurl += &encoded_kanji[..];
         let res = self.client.get(apiurl).send().unwrap();
 
         let text = res.text().unwrap();
@@ -129,7 +128,7 @@ impl Strokes for KanjiAliveApi {
                 if let serde_json::Value::Object(y) = &x2.1 {
                     if let serde_json::Value::Object(z) = &y["strokes"] {
                         if let serde_json::Value::Number(p) = &z["count"] {
-                            return p.as_u64().unwrap() as u32;
+                            p.as_u64().unwrap() as u32
                         } else {
                             panic!("key not found");
                         }
