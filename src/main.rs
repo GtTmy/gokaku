@@ -23,6 +23,7 @@ impl CharElement {
     }
 }
 
+#[derive(Debug)]
 struct Result {
     tenkaku: u32,
     gaikaku: u32,
@@ -68,7 +69,7 @@ impl Strokes for KanjiApi {
         let encoded_kanji =
             percent_encoding::utf8_percent_encode(&kanji.to_string()[..], NON_ALPHANUMERIC)
                 .to_string();
-        apiurl = apiurl + &encoded_kanji[..];
+        apiurl += &encoded_kanji[..];
         let res = self.client.get(apiurl).send().unwrap();
 
         let text = res.text().unwrap();
@@ -175,15 +176,35 @@ fn calc_jikaku(last_name: &str, first_name: &str) -> Result {
         }
     }
 
-    dbg!(last_name_items);
-    dbg!(first_name_items);
+    // dbg!(last_name_items);
+    // dbg!(first_name_items);
 
-    Result::new(0, 0, 0, 0, 0)
+    let tenkaku: u32 = last_name_items.iter().map(|x| x.strokes).sum();
+    let dikaku: u32 = first_name_items.iter().map(|x| x.strokes).sum();
+    let jinkaku: u32 =
+        last_name_items.iter().last().unwrap().strokes + first_name_items.get(0).unwrap().strokes;
+    let gaikaku = if (tenkaku + dikaku - jinkaku) > 0 {
+        tenkaku + dikaku - jinkaku
+    } else {
+        jinkaku
+    };
+    let soukaku: u32 = last_name_items
+        .iter()
+        .filter(|x| x.character.is_some())
+        .map(|x| x.strokes)
+        .sum::<u32>()
+        + first_name_items
+            .iter()
+            .filter(|x| x.character.is_some())
+            .map(|x| x.strokes)
+            .sum::<u32>();
+    Result::new(tenkaku, gaikaku, jinkaku, dikaku, soukaku)
 }
 
 fn main() {
     let last_name = String::from("山田");
     let first_name = String::from("花子");
 
-    calc_jikaku(&last_name[..], &first_name[..]);
+    let result = calc_jikaku(&last_name[..], &first_name[..]);
+    println!("Result -> {:?}", &result);
 }
