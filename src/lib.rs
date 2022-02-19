@@ -97,3 +97,22 @@ pub fn print_gokaku(x: &Gokaku) {
     println!("地格: {}", x.dikaku);
     println!("総格: {}", x.soukaku);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_calc_gokaku_basic_00001() {
+        let last_name_items: [CharElement; 2] = [CharElement::new('山', 3), CharElement::new('田', 5)];
+        let first_name_items: [CharElement; 2] = [CharElement::new('花', 7), CharElement::new('子', 3)];
+        let result = calc_jikaku(&last_name_items, &first_name_items);
+
+        assert_eq!(result.tenkaku, 8u32);
+        assert_eq!(result.gaikaku, 6u32);
+        assert_eq!(result.jinkaku, 12u32);
+        assert_eq!(result.dikaku, 10u32);
+        assert_eq!(result.soukaku, 18u32);
+    }
+
+}
