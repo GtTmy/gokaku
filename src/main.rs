@@ -1,5 +1,7 @@
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use reqwest::header;
+use clap::Parser;
+
 
 #[derive(Debug)]
 struct CharElement {
@@ -176,8 +178,8 @@ fn calc_jikaku(last_name: &str, first_name: &str) -> Result {
         }
     }
 
-    // dbg!(last_name_items);
-    // dbg!(first_name_items);
+    dbg!(&last_name_items);
+    dbg!(&first_name_items);
 
     let tenkaku: u32 = last_name_items.iter().map(|x| x.strokes).sum();
     let dikaku: u32 = first_name_items.iter().map(|x| x.strokes).sum();
@@ -201,10 +203,16 @@ fn calc_jikaku(last_name: &str, first_name: &str) -> Result {
     Result::new(tenkaku, gaikaku, jinkaku, dikaku, soukaku)
 }
 
-fn main() {
-    let last_name = String::from("山田");
-    let first_name = String::from("花子");
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about = None)]
+struct Args {
+    last_name: String,
+    first_name: String,
+}
 
-    let result = calc_jikaku(&last_name[..], &first_name[..]);
+fn main() {
+    let args = Args::parse();
+
+    let result = calc_jikaku(&args.last_name[..], &args.first_name[..]);
     println!("Result -> {:?}", &result);
 }
