@@ -104,8 +104,10 @@ mod tests {
 
     #[test]
     fn test_calc_gokaku_basic_00001() {
-        let last_name_items: [CharElement; 2] = [CharElement::new('山', 3), CharElement::new('田', 5)];
-        let first_name_items: [CharElement; 2] = [CharElement::new('花', 7), CharElement::new('子', 3)];
+        let last_name_items: [CharElement; 2] =
+            [CharElement::new('山', 3), CharElement::new('田', 5)];
+        let first_name_items: [CharElement; 2] =
+            [CharElement::new('花', 7), CharElement::new('子', 3)];
         let result = calc_jikaku(&last_name_items, &first_name_items);
 
         assert_eq!(result.tenkaku, 8u32);
@@ -114,5 +116,4 @@ mod tests {
         assert_eq!(result.dikaku, 10u32);
         assert_eq!(result.soukaku, 18u32);
     }
-
 }
